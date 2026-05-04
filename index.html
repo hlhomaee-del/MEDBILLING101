@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Claim That Went Wrong — Interactive Lesson</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg2: #111827;
+    --bg3: #1a2236;
+    --card: #1e2a3f;
+    --card2: #243047;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.15);
+    --text: #f0f4ff;
+    --muted: #8a9bb8;
+    --blue: #4f8ef7;
+    --blue2: #7eb3ff;
+    --teal: #2dd4a0;
+    --teal2: #5ef0c0;
+    --coral: #f77c5a;
+    --coral2: #ffaa8a;
+    --amber: #f5c542;
+    --amber2: #ffe07a;
+    --pink: #e06baa;
+    --pink2: #ff9ed0;
+    --purple: #9b7cf8;
+    --purple2: #c4a8ff;
+    --green: #4ade80;
+    --red: #f87171;
+    --r: 12px;
+    --r2: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.65; min-height: 100vh; overflow-x: hidden; }
+  h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
+
+  /* NAV */
+  .top-nav { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; gap: 0; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
+  .nav-brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; color: var(--teal); padding: 1rem 1.5rem 1rem 0; border-right: 1px solid var(--border); margin-right: 1rem; white-space: nowrap; }
+  .nav-tabs { display: flex; gap: 0; overflow-x: auto; flex: 1; }
+  .nav-tab { padding: 1rem 1rem; font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all .2s; letter-spacing: .03em; }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+  .progress-bar-wrap { height: 3px; background: var(--border); position: sticky; top: 57px; z-index: 99; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--teal), var(--blue)); width: 0%; transition: width .4s; }
+
+  /* SECTIONS */
+  .section { display: none; max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; animation: fadeUp .4s ease; }
+  .section.active { display: block; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+  /* HERO */
+  .hero { text-align: center; padding: 3rem 1rem 2rem; }
+  .hero-badge { display: inline-block; background: rgba(45,212,160,.12); color: var(--teal); border: 1px solid rgba(45,212,160,.3); border-radius: 100px; padding: 4px 14px; font-size: 12px; font-weight: 600; letter-spacing: .08em; margin-bottom: 1.5rem; }
+  .hero h1 { font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800; line-height: 1.15; margin-bottom: 1rem; }
+  .hero h1 span { color: var(--teal); }
+  .hero p { color: var(--muted); font-size: 1.05rem; max-width: 560px; margin: 0 auto 2rem; }
+  .hero-stats { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem; }
+  .hero-stat { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: .75rem 1.25rem; text-align: center; }
+  .hero-stat .num { font-size: 1.6rem; font-weight: 800; font-family: 'Syne', sans-serif; }
+  .hero-stat .lbl { font-size: 11px; color: var(--muted); letter-spacing: .05em; }
+  .start-btn { background: var(--teal); color: #0a1a14; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; border: none; border-radius: var(--r); padding: .85rem 2.5rem; cursor: pointer; transition: all .2s; letter-spacing: .03em; }
+  .start-btn:hover { background: var(--teal2); transform: translateY(-2px); }
+
+  /* SECTION HEADERS */
+  .sec-header { margin-bottom: 2rem; }
+  .sec-header .tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; background: rgba(79,142,247,.12); color: var(--blue2); border: 1px solid rgba(79,142,247,.25); border-radius: 100px; padding: 3px 12px; margin-bottom: .75rem; }
+  .sec-header h2 { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 800; line-height: 1.2; margin-bottom: .5rem; }
+  .sec-header p { color: var(--muted); font-size: .95rem; }
+
+  /* CHAIN */
+  .chain-wrap { overflow-x: auto; padding-bottom: .5rem; }
+  .chain { display: flex; align-items: stretch; gap: 0; min-width: 600px; }
+  .chain-arrow { display: flex; align-items: center; color: var(--border2); font-size: 1.3rem; padding: 0 4px; flex-shrink: 0; }
+  .chain-node { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 1rem; cursor: pointer; transition: all .25s; position: relative; }
+  .chain-node:hover { border-color: var(--teal); transform: translateY(-3px); }
+  .chain-node.active-node { border-color: var(--teal); background: rgba(45,212,160,.08); }
+  .chain-node .phase-num { font-size: 10px; font-weight: 700; letter-spacing: .1em; color: var(--teal); margin-bottom: 4px; }
+  .chain-node .phase-name { font-family: 'Syne', sans-serif; font-size: .85rem; font-weight: 700; margin-bottom: 4px; }
+  .chain-node .phase-status { font-size: 11px; color: var(--muted); }
+  .chain-node .fail-badge { position: absolute; top: -8px; right: -8px; background: var(--red); color: #fff; font-size: 10px; font-weight: 700; border-radius: 100px; padding: 2px 8px; opacity: 0; transition: opacity .3s; }
+  .chain-node.failed .fail-badge { opacity: 1; }
+  .chain-node.failed { border-color: var(--red); background: rgba(248,113,113,.07); }
+
+  .phase-detail { background: var(--card); border: 1px solid var(--border2); border-radius: var(--r); padding: 1.5rem; margin-top: 1.5rem; animation: fadeUp .3s ease; }
+  .phase-detail h3 { font-size: 1.2rem; margin-bottom: .5rem; }
+  .phase-detail .d-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+  .d-box { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r2); padding: .85rem 1rem; }
+  .d-box .d-label { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .d-box .d-val { font-size: .9rem; color: var(--text); }
+
+  /* ACTIVITY BOXES */
+  .activity-box { background: rgba(79,142,247,.06); border: 1px solid rgba(79,142,247,.2); border-radius: var(--r); padding: 1.5rem; margin: 1.5rem 0; }
+  .activity-box .act-header { display: flex; align-items: center; gap: .5rem; margin-bottom: 1rem; }
+  .act-icon { width: 28px; height: 28px; background: rgba(79,142,247,.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .act-title { font-family: 'Syne', sans-serif; font-size: .9rem; font-weight: 700; color: var(--blue2); }
+  .scenario-box { background: var(--bg3); border-left: 3px solid var(--amber); border-radius: 0 var(--r2) var(--r2) 0; padding: .85rem 1rem; margin-bottom: 1rem; font-style: italic; color: var(--amber2); font-size: .95rem; }
+
+  /* LAW CARDS */
+  .law-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1rem; }
+  .law-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 1.25rem; cursor: pointer; transition: all .25s; position: relative; overflow: hidden; }
+  .law-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: var(--r) var(--r) 0 0; }
+  .law-card.blue::before { background: var(--blue); }
+  .law-card.teal::before { background: var(--teal); }
+  .law-card.coral::before { background: var(--coral); }
+  .law-card.amber::before { background: var(--amber); }
+  .law-card.pink::before { background: var(--pink); }
+  .law-card.purple::before { background: var(--purple); }
+  .law-card:hover { transform: translateY(-3px); border-color: var(--border2); }
+  .law-card .law-abbr { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 800; margin-bottom: 4px; }
+  .law-card.blue .law-abbr { color: var(--blue2); }
+  .law-card.teal .law-abbr { color: var(--teal); }
+  .law-card.coral .law-abbr { color: var(--coral2); }
+  .law-card.amber .law-abbr { color: var(--amber2); }
+  .law-card.pink .law-abbr { color: var(--pink2); }
+  .law-card.purple .law-abbr { color: var(--purple2); }
+  .law-card .law-name { font-size: .8rem; color: var(--muted); margin-bottom: .75rem; }
+  .law-card .law-desc { font-size: .85rem; color: var(--text); display: none; }
+  .law-card.open .law-desc { display: block; animation: fadeUp .3s ease; }
+  .law-card .tap-hint { font-size: 11px; color: var(--muted); margin-top: .5rem; }
+  .law-card.open .tap-hint { display: none; }
+
+  /* QUIZ */
+  .quiz-scenario { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 1.25rem; margin-bottom: 1rem; }
+  .quiz-scenario .qs-label { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--muted); margin-bottom: .5rem; }
+  .quiz-scenario .qs-text { font-size: .95rem; margin-bottom: 1rem; }
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+  .opt-btn { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r2); padding: .65rem .9rem; cursor: pointer; font-size: .85rem; text-align: left; color: var(--text); transition: all .2s; font-family: 'DM Sans', sans-serif; }
+  .opt-btn:hover:not(:disabled) { border-color: var(--blue); color: var(--blue2); }
+  .opt-btn.correct { background: rgba(74,222,128,.1); border-color: var(--green); color: var(--green); }
+  .opt-btn.wrong { background: rgba(248,113,113,.1); border-color: var(--red); color: var(--red); }
+  .opt-btn:disabled { cursor: not-allowed; opacity: .7; }
+  .feedback { padding: .75rem 1rem; border-radius: var(--r2); font-size: .9rem; margin-top: .75rem; display: none; }
+  .feedback.correct { background: rgba(74,222,128,.1); border: 1px solid rgba(74,222,128,.3); color: var(--green); display: block; }
+  .feedback.wrong { background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.3); color: #fca5a5; display: block; }
+
+  /* PHI GAME */
+  .phi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: .75rem; }
+  .phi-item { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 1rem; text-align: center; cursor: pointer; transition: all .25s; font-size: .9rem; font-weight: 500; }
+  .phi-item:hover:not(.revealed) { border-color: var(--border2); transform: translateY(-2px); }
+  .phi-item.revealed-phi { background: rgba(248,113,113,.1); border-color: var(--red); color: var(--red); }
+  .phi-item.revealed-not { background: rgba(74,222,128,.1); border-color: var(--green); color: var(--green); }
+  .phi-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; margin-top: 4px; display: none; }
+  .phi-item.revealed-phi .phi-label { display: block; }
+  .phi-item.revealed-not .phi-label { display: block; }
+
+  /* FRAUD ABUSE */
+  .fa-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .fa-col { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 1.25rem; }
+  .fa-col h4 { font-size: .9rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: .4rem; }
+  .drop-zone { min-height: 100px; background: var(--bg3); border: 2px dashed var(--border); border-radius: var(--r2); padding: .75rem; display: flex; flex-direction: column; gap: .5rem; transition: border-color .2s; }
+  .drop-zone.over { border-color: var(--teal); }
+  .fa-card { background: var(--card2); border: 1px solid var(--border); border-radius: var(--r2); padding: .6rem .9rem; cursor: grab; font-size: .85rem; transition: all .2s; user-select: none; }
+  .fa-card:hover { border-color: var(--border2); }
+  .fa-card.dragging { opacity: .4; }
+
+  /* SYNTHESIS */
+  .case-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+  .case-fact { background: var(--card); border-left: 3px solid var(--coral); border-radius: 0 var(--r2) var(--r2) 0; padding: 1rem 1.25rem; font-size: .9rem; }
+  .case-fact .cf-num { font-size: 11px; font-weight: 700; color: var(--coral2); letter-spacing: .06em; margin-bottom: 3px; }
+  .reveal-panel { background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--r); padding: 1.25rem; margin-top: 1.5rem; display: none; animation: fadeUp .4s ease; }
+  .reveal-panel.shown { display: block; }
+  .violation-item { display: flex; gap: .75rem; align-items: flex-start; padding: .75rem 0; border-bottom: 1px solid var(--border); }
+  .violation-item:last-child { border-bottom: none; }
+  .v-badge { background: rgba(248,113,113,.15); color: var(--red); border: 1px solid rgba(248,113,113,.3); border-radius: 100px; padding: 2px 10px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .v-text { font-size: .9rem; }
+  .v-law { color: var(--coral2); font-weight: 600; }
+
+  /* EXAM */
+  .exam-q { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 1.5rem; margin-bottom: 1.25rem; }
+  .q-num { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--purple2); margin-bottom: .5rem; }
+  .q-text { font-size: 1rem; font-weight: 500; margin-bottom: 1rem; }
+  .q-options { display: flex; flex-direction: column; gap: .45rem; }
+  .q-opt { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r2); padding: .65rem 1rem; cursor: pointer; font-size: .9rem; display: flex; align-items: center; gap: .75rem; transition: all .2s; }
+  .q-opt:hover:not(:disabled) { border-color: var(--purple); }
+  .q-opt .opt-letter { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .q-opt.correct-ans { background: rgba(74,222,128,.1); border-color: var(--green); }
+  .q-opt.correct-ans .opt-letter { background: var(--green); border-color: var(--green); color: #012; }
+  .q-opt.wrong-ans { background: rgba(248,113,113,.08); border-color: var(--red); }
+  .q-opt.wrong-ans .opt-letter { background: var(--red); border-color: var(--red); color: #fff; }
+  .q-opt:disabled { cursor: not-allowed; }
+  .q-explain { background: rgba(155,124,248,.08); border: 1px solid rgba(155,124,248,.2); border-radius: var(--r2); padding: .85rem 1rem; margin-top: .75rem; font-size: .875rem; color: var(--purple2); display: none; }
+  .q-explain.shown { display: block; animation: fadeUp .3s; }
+
+  /* SCORE */
+  .score-wrap { text-align: center; padding: 2rem; background: var(--card); border: 1px solid var(--border); border-radius: var(--r); margin-top: 1.5rem; }
+  .score-num { font-size: 3.5rem; font-weight: 800; font-family: 'Syne', sans-serif; }
+  .score-label { color: var(--muted); margin-top: .25rem; }
+
+  /* COMPLIANCE */
+  .compliance-steps { display: flex; flex-direction: column; gap: .75rem; counter-reset: steps; }
+  .c-step { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 1rem 1.25rem; display: flex; align-items: flex-start; gap: 1rem; cursor: pointer; transition: all .25s; }
+  .c-step:hover { border-color: var(--border2); }
+  .c-step.expanded { border-color: var(--teal); background: rgba(45,212,160,.05); }
+  .c-step-num { width: 32px; height: 32px; border-radius: 50%; background: rgba(45,212,160,.1); border: 1px solid rgba(45,212,160,.3); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 800; font-size: .9rem; color: var(--teal); flex-shrink: 0; }
+  .c-step-content { flex: 1; }
+  .c-step-title { font-weight: 600; font-size: .95rem; margin-bottom: 0; }
+  .c-step-detail { font-size: .85rem; color: var(--muted); margin-top: .5rem; display: none; }
+  .c-step.expanded .c-step-detail { display: block; animation: fadeUp .3s; }
+
+  /* CONSENT TABLE */
+  .consent-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  .consent-table th { background: var(--bg3); padding: .75rem 1rem; text-align: left; font-size: .85rem; font-weight: 600; border: 1px solid var(--border); color: var(--muted); }
+  .consent-table td { padding: .75rem 1rem; font-size: .875rem; border: 1px solid var(--border); vertical-align: top; }
+  .consent-table tr:hover td { background: rgba(255,255,255,.02); }
+
+  /* AUDIT TABLE */
+  .audit-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1rem; }
+  .audit-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 1.25rem; }
+  .audit-card .ac-type { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 800; margin-bottom: 4px; }
+  .audit-card.blue .ac-type { color: var(--blue2); }
+  .audit-card.amber .ac-type { color: var(--amber2); }
+  .audit-card.coral .ac-type { color: var(--coral2); }
+  .audit-card .ac-label { font-size: 11px; color: var(--muted); margin-bottom: .75rem; }
+  .audit-card .ac-desc { font-size: .875rem; }
+  .audit-card .ac-tag { display: inline-block; font-size: 11px; font-weight: 600; border-radius: 100px; padding: 2px 10px; margin-top: .5rem; }
+  .audit-card.blue .ac-tag { background: rgba(79,142,247,.12); color: var(--blue2); border: 1px solid rgba(79,142,247,.25); }
+  .audit-card.amber .ac-tag { background: rgba(245,197,66,.1); color: var(--amber2); border: 1px solid rgba(245,197,66,.2); }
+  .audit-card.coral .ac-tag { background: rgba(247,124,90,.1); color: var(--coral2); border: 1px solid rgba(247,124,90,.2); }
+
+  /* NAV BTNS */
+  .nav-btns { display: flex; justify-content: space-between; margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+  .nav-btn { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: .65rem 1.25rem; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: .875rem; color: var(--text); transition: all .2s; }
+  .nav-btn:hover { border-color: var(--border2); }
+  .nav-btn.primary { background: var(--teal); color: #0a1a14; border-color: var(--teal); font-weight: 600; }
+  .nav-btn.primary:hover { background: var(--teal2); }
+  .nav-btn:disabled { opacity: .3; cursor: not-allowed; }
+
+  /* PULSE ANIM */
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.5; } }
+  .pulse { animation: pulse 2s infinite; }
+
+  /* REVEAL BTN */
+  .reveal-btn { background: rgba(247,124,90,.1); border: 1px solid rgba(247,124,90,.3); color: var(--coral2); border-radius: var(--r); padding: .75rem 1.5rem; cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 700; font-size: .9rem; transition: all .2s; display: block; margin: 1rem auto; }
+  .reveal-btn:hover { background: rgba(247,124,90,.2); }
+
+  /* TAG */
+  .tag-pill { display: inline-block; border-radius: 100px; padding: 2px 10px; font-size: 11px; font-weight: 700; letter-spacing: .05em; }
+  .tag-blue { background: rgba(79,142,247,.12); color: var(--blue2); border: 1px solid rgba(79,142,247,.25); }
+  .tag-teal { background: rgba(45,212,160,.1); color: var(--teal); border: 1px solid rgba(45,212,160,.25); }
+  .tag-coral { background: rgba(247,124,90,.1); color: var(--coral2); border: 1px solid rgba(247,124,90,.25); }
+  .tag-amber { background: rgba(245,197,66,.1); color: var(--amber2); border: 1px solid rgba(245,197,66,.25); }
+  .tag-red { background: rgba(248,113,113,.1); color: var(--red); border: 1px solid rgba(248,113,113,.3); }
+  .tag-green { background: rgba(74,222,128,.1); color: var(--green); border: 1px solid rgba(74,222,128,.3); }
+
+  /* SCORE RING */
+  .ring-wrap { position: relative; width: 140px; height: 140px; margin: 0 auto 1rem; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+
+  /* TOOLTIP */
+  .tip { position: relative; display: inline-block; border-bottom: 1px dashed var(--muted); cursor: help; }
+  .tip::after { content: attr(data-tip); position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%); background: var(--card2); border: 1px solid var(--border2); border-radius: var(--r2); padding: .5rem .75rem; font-size: .8rem; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .2s; z-index: 50; color: var(--text); }
+  .tip:hover::after { opacity: 1; }
+
+  /* TICKER */
+  .ticker { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: .5rem 0; overflow: hidden; margin-bottom: 2rem; }
+  .ticker-inner { display: flex; gap: 3rem; animation: ticker 20s linear infinite; white-space: nowrap; }
+  @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .ticker-item { font-size: 12px; color: var(--muted); font-weight: 500; letter-spacing: .03em; }
+  .ticker-item span { color: var(--teal); }
+
+  /* KEY INSIGHT */
+  .insight { background: rgba(155,124,248,.06); border: 1px solid rgba(155,124,248,.2); border-radius: var(--r); padding: 1.25rem; margin: 1.5rem 0; display: flex; gap: 1rem; align-items: flex-start; }
+  .insight-icon { font-size: 1.2rem; flex-shrink: 0; }
+  .insight-text { font-size: .9rem; color: var(--purple2); line-height: 1.6; }
+  .insight-text strong { color: #e0cfff; }
+
+
+  /* HIGH-CONTRAST PRACTICE + EXAM FIX
+     Keeps all question text and clickable answer options readable on the dark background. */
+  .quiz-scenario,
+  .exam-q,
+  .activity-box,
+  #examQuestions {
+    color: var(--text);
+  }
+
+  .quiz-scenario .qs-text,
+  .exam-q .q-text,
+  #examQuestions .q-text {
+    color: #ffe680;
+    font-weight: 700;
+    text-shadow: 0 1px 8px rgba(245, 197, 66, 0.18);
+  }
+
+  .quiz-scenario .qs-label,
+  .exam-q .q-num,
+  #examQuestions .q-num {
+    color: #ffd84d;
+  }
+
+  .opt-btn,
+  .q-opt,
+  #examQuestions .q-opt,
+  #examQuestions button,
+  .activity-box .opt-btn {
+    color: #ffe680 !important;
+    background: linear-gradient(135deg, rgba(245,197,66,.16), rgba(255,224,122,.08)) !important;
+    border: 1px solid rgba(255,224,122,.55) !important;
+    box-shadow: 0 0 0 1px rgba(255,224,122,.08), 0 8px 22px rgba(0,0,0,.22);
+  }
+
+  .opt-btn:hover:not(:disabled),
+  .q-opt:hover:not(:disabled),
+  #examQuestions .q-opt:hover:not(:disabled),
+  #examQuestions button:hover:not(:disabled),
+  .activity-box .opt-btn:hover:not(:disabled) {
+    color: #fff3b0 !important;
+    border-color: #ffe07a !important;
+    background: linear-gradient(135deg, rgba(245,197,66,.28), rgba(255,224,122,.14)) !important;
+    transform: translateY(-1px);
+  }
+
+  .q-opt .opt-letter,
+  #examQuestions .opt-letter {
+    color: #1a1300 !important;
+    background: #ffd84d;
+    border-color: #ffe07a;
+    box-shadow: 0 0 12px rgba(255,224,122,.35);
+  }
+
+  .q-opt.correct-ans,
+  .opt-btn.correct,
+  #examQuestions .q-opt.correct-ans {
+    background: rgba(74,222,128,.16) !important;
+    border-color: var(--green) !important;
+    color: #86efac !important;
+  }
+
+  .q-opt.wrong-ans,
+  .opt-btn.wrong,
+  #examQuestions .q-opt.wrong-ans {
+    background: rgba(248,113,113,.15) !important;
+    border-color: var(--red) !important;
+    color: #fecaca !important;
+  }
+
+  .q-opt.correct-ans .opt-letter,
+  #examQuestions .q-opt.correct-ans .opt-letter {
+    background: var(--green);
+    border-color: var(--green);
+    color: #012 !important;
+  }
+
+  .q-opt.wrong-ans .opt-letter,
+  #examQuestions .q-opt.wrong-ans .opt-letter {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff !important;
+  }
+
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="nav-brand">MedBilling 101</div>
+  <div class="nav-tabs" id="navTabs">
+    <div class="nav-tab active" data-section="0">🏠 Intro</div>
+    <div class="nav-tab" data-section="1">🔗 Revenue Cycle</div>
+    <div class="nav-tab" data-section="2">⚖️ Laws</div>
+    <div class="nav-tab" data-section="3">🔒 PHI</div>
+    <div class="nav-tab" data-section="4">🕵️ Fraud vs Abuse</div>
+    <div class="nav-tab" data-section="5">📋 Compliance</div>
+    <div class="nav-tab" data-section="6">✍️ Consent & Audits</div>
+    <div class="nav-tab" data-section="7">🧠 Full Case</div>
+    <div class="nav-tab" data-section="8">📝 Exam Prep</div>
+  </div>
+</nav>
+<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+
+<!-- SECTION 0: INTRO -->
+<div class="section active" id="s0">
+  <div class="hero">
+    <div class="hero-badge">NHA EXAM PREP · INTERACTIVE LESSON</div>
+    <h1>The Claim That <span>Went Wrong</span></h1>
+    <p>Master the Revenue Cycle, Healthcare Law & Compliance. Click everything. Break things. Learn how it all connects.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num" style="color:var(--teal)">8</div><div class="lbl">MODULES</div></div>
+      <div class="hero-stat"><div class="num" style="color:var(--blue2)">6</div><div class="lbl">LAWS COVERED</div></div>
+      <div class="hero-stat"><div class="num" style="color:var(--coral2)">5</div><div class="lbl">LIVE QUIZZES</div></div>
+      <div class="hero-stat"><div class="num" style="color:var(--amber2)">5</div><div class="lbl">EXAM QUESTIONS</div></div>
+    </div>
+    <button class="start-btn" onclick="goTo(1)">Start Learning →</button>
+  </div>
+
+  <div class="ticker">
+    <div class="ticker-inner" id="tickerInner"></div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; margin-top:1rem;">
+    <div class="law-card blue" style="cursor:default;">
+      <div class="law-abbr">Revenue Cycle</div>
+      <div class="law-name">8 linked phases</div>
+      <div class="law-desc" style="display:block; font-size:.85rem;">From patient registration through final payment — every step is connected. One failure cascades.</div>
+    </div>
+    <div class="law-card teal" style="cursor:default;">
+      <div class="law-abbr">6 Federal Laws</div>
+      <div class="law-name">HIPAA · FCA · Stark · HITECH · FDCPA · AKS</div>
+      <div class="law-desc" style="display:block; font-size:.85rem;">Learn to recognize violations instantly, not just memorize definitions.</div>
+    </div>
+    <div class="law-card coral" style="cursor:default;">
+      <div class="law-abbr">Real Scenarios</div>
+      <div class="law-name">Clickable, interactive, immediate feedback</div>
+      <div class="law-desc" style="display:block; font-size:.85rem;">Every activity mirrors real NHA exam question styles and clinical situations.</div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn" disabled>← Back</button>
+    <button class="nav-btn primary" onclick="goTo(1)">Revenue Cycle →</button>
+  </div>
+</div>
+
+<!-- SECTION 1: REVENUE CYCLE -->
+<div class="section" id="s1">
+  <div class="sec-header">
+    <div class="tag">PART 1 · REVENUE CYCLE</div>
+    <h2>The Chain Reaction</h2>
+    <p>Click each phase to explore what it does and what happens when it fails.</p>
+  </div>
+
+  <div class="insight">
+    <div class="insight-icon">💡</div>
+    <div class="insight-text"><strong>Key concept:</strong> The revenue cycle is not a list of steps — it's a chain reaction. A failure in Phase 1 doesn't just affect Phase 1. It creates a cascade that can cost thousands of dollars downstream.</div>
+  </div>
+
+  <div class="chain-wrap">
+    <div class="chain" id="chainEl">
+      <div class="chain-node" data-phase="0" onclick="selectPhase(0)">
+        <div class="fail-badge">FAILED</div>
+        <div class="phase-num">PHASE 01</div>
+        <div class="phase-name">Pre-Registration</div>
+        <div class="phase-status">Click to explore</div>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-node" data-phase="1" onclick="selectPhase(1)">
+        <div class="fail-badge">FAILED</div>
+        <div class="phase-num">PHASE 02</div>
+        <div class="phase-name">Registration</div>
+        <div class="phase-status">Click to explore</div>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-node" data-phase="2" onclick="selectPhase(2)">
+        <div class="fail-badge">FAILED</div>
+        <div class="phase-num">PHASE 03</div>
+        <div class="phase-name">Coding</div>
+        <div class="phase-status">Click to explore</div>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-node" data-phase="3" onclick="selectPhase(3)">
+        <div class="fail-badge">FAILED</div>
+        <div class="phase-num">PHASE 04</div>
+        <div class="phase-name">Billing</div>
+        <div class="phase-status">Click to explore</div>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-node" data-phase="4" onclick="selectPhase(4)">
+        <div class="fail-badge">FAILED</div>
+        <div class="phase-num">PHASE 05</div>
+        <div class="phase-name">Payment</div>
+        <div class="phase-status">Click to explore</div>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-node" data-phase="5" onclick="selectPhase(5)">
+        <div class="fail-badge">FAILED</div>
+        <div class="phase-num">PHASE 06</div>
+        <div class="phase-name">Follow-Up</div>
+        <div class="phase-status">Click to explore</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="phaseDetail" class="phase-detail" style="display:none;"></div>
+
+  <div class="activity-box" style="margin-top:2rem;">
+    <div class="act-header">
+      <div class="act-icon">🔗</div>
+      <div class="act-title">ACTIVITY: "Break the Chain"</div>
+    </div>
+    <div class="scenario-box">A patient's insurance ID was entered incorrectly at check-in. What happens next?</div>
+    <p style="font-size:.9rem; color:var(--muted); margin-bottom:.75rem;">Click each consequence to reveal the downstream impact:</p>
+    <div style="display:flex; flex-direction:column; gap:.5rem;">
+      <div class="opt-btn" onclick="revealConsequence(this, 'The claim is submitted with wrong insurance data → immediately rejected by the payer. No payment is processed.')">1. Claim goes to billing with wrong info...</div>
+      <div class="opt-btn" onclick="revealConsequence(this, 'Days or weeks pass while staff manually corrects and resubmits. Staff time = cost. Late filing deadlines can result in permanent denial.')">2. Resubmission causes delay...</div>
+      <div class="opt-btn" onclick="revealConsequence(this, 'If the correct payer never receives the claim, the patient may receive a bill they should not have. This damages patient trust and creates collections issues.')">3. Patient gets billed incorrectly...</div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="goTo(0)">← Intro</button>
+    <button class="nav-btn primary" onclick="goTo(2)">Laws & Regulations →</button>
+  </div>
+</div>
+
+<!-- SECTION 2: LAWS -->
+<div class="section" id="s2">
+  <div class="sec-header">
+    <div class="tag">PART 2 · LAWS & REGULATIONS</div>
+    <h2>Know the Law. Spot the Violation.</h2>
+    <p>Click any law to expand its definition, penalties, and real examples. Then test yourself below.</p>
+  </div>
+
+  <div class="law-cards" id="lawCards">
+    <div class="law-card blue" onclick="toggleLaw(this)">
+      <div class="law-abbr">HIPAA</div>
+      <div class="law-name">Health Insurance Portability & Accountability Act</div>
+      <div class="tap-hint">Tap to expand ↓</div>
+      <div class="law-desc">
+        <strong style="color:var(--blue2)">Protects:</strong> Patient health information (PHI) privacy and security.<br><br>
+        <strong style="color:var(--blue2)">Violation example:</strong> A biller texts patient diagnosis info to a friend.<br><br>
+        <strong style="color:var(--blue2)">Penalty:</strong> Up to $1.9M per violation category per year. Criminal charges possible.
+      </div>
+    </div>
+    <div class="law-card coral" onclick="toggleLaw(this)">
+      <div class="law-abbr">FCA</div>
+      <div class="law-name">False Claims Act</div>
+      <div class="tap-hint">Tap to expand ↓</div>
+      <div class="law-desc">
+        <strong style="color:var(--coral2)">Protects:</strong> Government programs (Medicare/Medicaid) from fraudulent billing.<br><br>
+        <strong style="color:var(--coral2)">Violation example:</strong> A clinic bills Medicare for services never provided.<br><br>
+        <strong style="color:var(--coral2)">Penalty:</strong> Up to 3x the damages plus $22,000+ per false claim. Civil and criminal liability.
+      </div>
+    </div>
+    <div class="law-card amber" onclick="toggleLaw(this)">
+      <div class="law-abbr">Stark Law</div>
+      <div class="law-name">Physician Self-Referral Law</div>
+      <div class="tap-hint">Tap to expand ↓</div>
+      <div class="law-desc">
+        <strong style="color:var(--amber2)">Protects:</strong> Prevents conflicts of interest in patient referrals.<br><br>
+        <strong style="color:var(--amber2)">Violation example:</strong> A doctor refers patients to a lab they own a financial interest in.<br><br>
+        <strong style="color:var(--amber2)">Penalty:</strong> Denial of claims, repayment, civil fines up to $15,000 per service.
+      </div>
+    </div>
+    <div class="law-card teal" onclick="toggleLaw(this)">
+      <div class="law-abbr">HITECH</div>
+      <div class="law-name">Health Information Technology for Economic and Clinical Health Act</div>
+      <div class="tap-hint">Tap to expand ↓</div>
+      <div class="law-desc">
+        <strong style="color:var(--teal)">Protects:</strong> Strengthens HIPAA for electronic health records (EHR).<br><br>
+        <strong style="color:var(--teal)">Violation example:</strong> A clinic's unencrypted laptop with patient records is stolen — and they fail to report the breach.<br><br>
+        <strong style="color:var(--teal)">Penalty:</strong> Mandatory breach notifications. Increases HIPAA fines significantly.
+      </div>
+    </div>
+    <div class="law-card pink" onclick="toggleLaw(this)">
+      <div class="law-abbr">FDCPA</div>
+      <div class="law-name">Fair Debt Collection Practices Act</div>
+      <div class="tap-hint">Tap to expand ↓</div>
+      <div class="law-desc">
+        <strong style="color:var(--pink2)">Protects:</strong> Patients from abusive debt collection practices.<br><br>
+        <strong style="color:var(--pink2)">Violation example:</strong> Collections agent calls a patient at 11pm repeatedly.<br><br>
+        <strong style="color:var(--pink2)">Penalty:</strong> Patient can sue for up to $1,000 plus attorney fees.
+      </div>
+    </div>
+    <div class="law-card purple" onclick="toggleLaw(this)">
+      <div class="law-abbr">AKS</div>
+      <div class="law-name">Anti-Kickback Statute</div>
+      <div class="tap-hint">Tap to expand ↓</div>
+      <div class="law-desc">
+        <strong style="color:var(--purple2)">Protects:</strong> Prohibits paying for patient referrals for government-funded services.<br><br>
+        <strong style="color:var(--purple2)">Violation example:</strong> A pharmaceutical company pays a doctor to prescribe their drug.<br><br>
+        <strong style="color:var(--purple2)">Penalty:</strong> Felony criminal charges, up to 10 years per violation, $100K+ fines.
+      </div>
+    </div>
+  </div>
+
+  <div class="activity-box" style="margin-top:2rem;">
+    <div class="act-header">
+      <div class="act-icon">⚖️</div>
+      <div class="act-title">ACTIVITY: Legal or Illegal? — Identify the Violation</div>
+    </div>
+    <div id="lawQuiz"></div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="goTo(1)">← Revenue Cycle</button>
+    <button class="nav-btn primary" onclick="goTo(3)">PHI Activity →</button>
+  </div>
+</div>
+
+<!-- SECTION 3: PHI -->
+<div class="section" id="s3">
+  <div class="sec-header">
+    <div class="tag">PART 3 · PHI</div>
+    <h2>PHI or Not PHI?</h2>
+    <p>Click each item to reveal whether it qualifies as Protected Health Information. This is heavily tested on the NHA exam.</p>
+  </div>
+
+  <div class="insight">
+    <div class="insight-icon">🔑</div>
+    <div class="insight-text"><strong>The golden rule:</strong> If the information can be used to identify a specific patient AND is related to their health, condition, treatment, or payment — it is PHI. There are 18 specific identifiers under HIPAA.</div>
+  </div>
+
+  <div class="phi-grid" id="phiGrid"></div>
+
+  <div style="display:flex; gap:1rem; margin-top:1.25rem; flex-wrap:wrap;">
+    <div style="display:flex; align-items:center; gap:.5rem; font-size:.85rem;"><span style="width:12px; height:12px; border-radius:3px; background:var(--red); display:inline-block;"></span> PHI — Protected</div>
+    <div style="display:flex; align-items:center; gap:.5rem; font-size:.85rem;"><span style="width:12px; height:12px; border-radius:3px; background:var(--green); display:inline-block;"></span> Not PHI — Safe to share</div>
+  </div>
+
+  <div class="activity-box" style="margin-top:2rem;">
+    <div class="act-header">
+      <div class="act-icon">🔓</div>
+      <div class="act-title">ACTIVITY: Permitted Disclosure — Is it Allowed?</div>
+    </div>
+    <div id="disclosureQuiz"></div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="goTo(2)">← Laws</button>
+    <button class="nav-btn primary" onclick="goTo(4)">Fraud vs Abuse →</button>
+  </div>
+</div>
+
+<!-- SECTION 4: FRAUD vs ABUSE -->
+<div class="section" id="s4">
+  <div class="sec-header">
+    <div class="tag">PART 4 · FRAUD vs ABUSE</div>
+    <h2>Fraud or Abuse?</h2>
+    <p>The key difference is <strong style="color:var(--coral2)">intent</strong>. Drag each scenario to the correct category, or click to reveal.</p>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
+    <div class="d-box">
+      <div class="d-label" style="color:var(--red);">Fraud</div>
+      <div class="d-val">A deliberate deception or misrepresentation to obtain payment. <strong style="color:var(--red);">INTENT is required.</strong> Always illegal.</div>
+    </div>
+    <div class="d-box">
+      <div class="d-label" style="color:var(--amber2);">Abuse</div>
+      <div class="d-val">Practices that result in unnecessary costs without necessarily involving intentional deception. Often caused by poor training or sloppy processes.</div>
+    </div>
+  </div>
+
+  <div id="fraudAbuseActivity"></div>
+
+  <div class="insight" style="margin-top:1.5rem;">
+    <div class="insight-icon">⚠️</div>
+    <div class="insight-text"><strong>Important:</strong> Abuse can become fraud if the provider is warned and continues the behavior anyway. "I didn't know" stops working as a defense once you've been educated. The OIG takes repeated abuse very seriously.</div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="goTo(3)">← PHI</button>
+    <button class="nav-btn primary" onclick="goTo(5)">Compliance Plans →</button>
+  </div>
+</div>
+
+<!-- SECTION 5: COMPLIANCE -->
+<div class="section" id="s5">
+  <div class="sec-header">
+    <div class="tag">PART 5 · COMPLIANCE</div>
+    <h2>Building a Compliance Plan</h2>
+    <p>Click each element of a compliance plan to see what it involves and why it matters.</p>
+  </div>
+
+  <div class="compliance-steps" id="complianceSteps"></div>
+
+  <div style="margin-top:2rem;" class="activity-box">
+    <div class="act-header">
+      <div class="act-icon">🚨</div>
+      <div class="act-title">OIG + Self-Disclosure Protocol (SDP)</div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+      <div class="d-box">
+        <div class="d-label" style="color:var(--blue2)">OIG</div>
+        <div class="d-val">Office of Inspector General. Investigates healthcare fraud, abuse, and compliance violations. Can exclude providers from Medicare/Medicaid permanently.</div>
+      </div>
+      <div class="d-box">
+        <div class="d-label" style="color:var(--teal)">SDP — Self-Disclosure</div>
+        <div class="d-val">If a clinic discovers it has overbilled or violated a rule — they should self-report through the OIG's Self-Disclosure Protocol BEFORE the government finds it. Penalties are typically lower.</div>
+      </div>
+    </div>
+    <div class="scenario-box" style="margin-top:1rem;">Scenario: Your clinic discovers it accidentally billed Medicare for 50 services that were never fully documented. What do you do?</div>
+    <div style="display:flex; flex-direction:column; gap:.5rem; margin-top:.5rem;">
+      <div class="opt-btn" onclick="sdpAnswer(this, false)">A. Hope no one notices and keep billing normally.</div>
+      <div class="opt-btn" onclick="sdpAnswer(this, false)">B. Quietly refund the amounts without reporting.</div>
+      <div class="opt-btn" onclick="sdpAnswer(this, true)">C. Use the OIG Self-Disclosure Protocol to self-report and repay.</div>
+      <div class="opt-btn" onclick="sdpAnswer(this, false)">D. Wait for the audit — then explain it was accidental.</div>
+    </div>
+    <div id="sdpFeedback"></div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="goTo(4)">← Fraud vs Abuse</button>
+    <button class="nav-btn primary" onclick="goTo(6)">Consent & Audits →</button>
+  </div>
+</div>
+
+<!-- SECTION 6: CONSENT & AUDITS -->
+<div class="section" id="s6">
+  <div class="sec-header">
+    <div class="tag">PART 6 · CONSENT & AUDITS</div>
+    <h2>Consent Types & Audit Methods</h2>
+    <p>Understanding how patients authorize care — and how agencies verify it later.</p>
+  </div>
+
+  <h3 style="font-size:1.1rem; margin-bottom:1rem; margin-top:.5rem;">Types of Patient Consent</h3>
+  <table class="consent-table">
+    <thead>
+      <tr><th>Type</th><th>What It Means</th><th>Example</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Informed Consent</strong></td>
+        <td>Patient fully understands the procedure, risks, benefits, and alternatives before agreeing.</td>
+        <td>Surgeon explains surgery risks; patient asks questions and agrees.</td>
+        <td><span class="tag-pill tag-teal">Required for procedures</span></td>
+      </tr>
+      <tr>
+        <td><strong>Written Consent</strong></td>
+        <td>Patient signs a physical or electronic document authorizing treatment.</td>
+        <td>Signing a treatment authorization form at check-in.</td>
+        <td><span class="tag-pill tag-blue">Signed document</span></td>
+      </tr>
+      <tr>
+        <td><strong>Implied Consent</strong></td>
+        <td>Patient's actions indicate agreement — no verbal or written consent given.</td>
+        <td>Patient rolls up sleeve for a blood draw.</td>
+        <td><span class="tag-pill tag-amber">Action-based</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="activity-box">
+    <div class="act-header"><div class="act-icon">✍️</div><div class="act-title">ACTIVITY: What Type of Consent?</div></div>
+    <div id="consentQuiz"></div>
+  </div>
+
+  <h3 style="font-size:1.1rem; margin-top:2rem; margin-bottom:1rem;">Audit Types — Who Watches the Watchers?</h3>
+  <div class="audit-cards" id="auditCards">
+    <div class="audit-card blue">
+      <div class="ac-type">Internal Audit</div>
+      <div class="ac-label">Self-monitoring</div>
+      <div class="ac-desc">The facility audits its own records, claims, and processes to catch errors before regulators do. Part of every strong compliance plan.</div>
+      <div class="ac-tag">Preventive</div>
+    </div>
+    <div class="audit-card amber">
+      <div class="ac-type">RAC Audit</div>
+      <div class="ac-label">Recovery Audit Contractor</div>
+      <div class="ac-desc">Private contractors hired by CMS to find and recover Medicare/Medicaid overpayments. They work on contingency — paid a percentage of what they recover.</div>
+      <div class="ac-tag">Recovery-focused</div>
+    </div>
+    <div class="audit-card coral">
+      <div class="ac-type">ZPIC / UPICs</div>
+      <div class="ac-label">Zone Program Integrity Contractors</div>
+      <div class="ac-desc">Detect patterns of fraud across entire regions. Use data analytics to spot suspicious billing patterns that indicate systematic fraud.</div>
+      <div class="ac-tag">Pattern detection</div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="goTo(5)">← Compliance</button>
+    <button class="nav-btn primary" onclick="goTo(7)">Full Case Synthesis →</button>
+  </div>
+</div>
+
+<!-- SECTION 7: FULL CASE -->
+<div class="section" id="s7">
+  <div class="sec-header">
+    <div class="tag">PART 7 · SYNTHESIS</div>
+    <h2>The Full Case: Everything Goes Wrong</h2>
+    <p>A provider has made multiple serious errors. Read the facts, then analyze the case.</p>
+  </div>
+
+  <div class="case-grid" id="caseFacts"></div>
+
+  <button class="reveal-btn" id="caseRevealBtn" onclick="revealCase()">🔍 Analyze the Case — Reveal All Violations</button>
+
+  <div class="reveal-panel" id="casePanel">
+    <h3 style="margin-bottom:1.25rem; font-size:1.1rem; color:var(--coral2);">Case Analysis Results</h3>
+    <div id="violationsList"></div>
+
+    <div style="margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid var(--border);">
+      <h4 style="font-size:.95rem; margin-bottom:1rem; color:var(--amber2);">Predicted Consequences</h4>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.75rem;">
+        <div class="d-box"><div class="d-label" style="color:var(--red)">Financial</div><div class="d-val" style="font-size:.85rem;">Claim repayments + 3x damages under FCA. Potential exclusion from Medicare/Medicaid.</div></div>
+        <div class="d-box"><div class="d-label" style="color:var(--coral2)">Legal</div><div class="d-val" style="font-size:.85rem;">Criminal charges for HIPAA violations & FCA fraud. Civil penalties for Stark Law violations.</div></div>
+        <div class="d-box"><div class="d-label" style="color:var(--amber2)">Operational</div><div class="d-val" style="font-size:.85rem;">Mandatory compliance monitoring. Possible corporate integrity agreement with OIG.</div></div>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid var(--border);">
+      <h4 style="font-size:.95rem; margin-bottom:1rem; color:var(--teal);">Recommended Corrective Actions</h4>
+      <div style="display:flex; flex-direction:column; gap:.6rem;">
+        <div style="display:flex; align-items:center; gap:.75rem; font-size:.875rem;"><span class="tag-pill tag-teal">1</span> File Self-Disclosure Protocol with OIG immediately for overbilled claims.</div>
+        <div style="display:flex; align-items:center; gap:.75rem; font-size:.875rem;"><span class="tag-pill tag-teal">2</span> Conduct full HIPAA breach assessment and notify affected patients within 60 days.</div>
+        <div style="display:flex; align-items:center; gap:.75rem; font-size:.875rem;"><span class="tag-pill tag-teal">3</span> Dissolve any financial interest in referred facilities to comply with Stark Law.</div>
+        <div style="display:flex; align-items:center; gap:.75rem; font-size:.875rem;"><span class="tag-pill tag-teal">4</span> Implement mandatory coding and compliance training for all billing staff.</div>
+        <div style="display:flex; align-items:center; gap:.75rem; font-size:.875rem;"><span class="tag-pill tag-teal">5</span> Establish internal audit schedule — quarterly billing reviews.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="goTo(6)">← Consent & Audits</button>
+    <button class="nav-btn primary" onclick="goTo(8)">Exam Prep →</button>
+  </div>
+</div>
+
+<!-- SECTION 8: EXAM -->
+<div class="section" id="s8">
+  <div class="sec-header">
+    <div class="tag">PART 8 · EXAM PREP</div>
+    <h2>NHA-Style Practice Questions</h2>
+    <p>5 questions. Click your answer for immediate feedback and explanation.</p>
+  </div>
+
+  <div id="examQuestions"></div>
+
+  <div class="score-wrap" id="scoreWrap" style="display:none;">
+    <div class="ring-wrap">
+      <svg width="140" height="140" viewBox="0 0 140 140">
+        <circle cx="70" cy="70" r="54" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="12"/>
+        <circle cx="70" cy="70" r="54" fill="none" stroke="var(--teal)" stroke-width="12" stroke-linecap="round"
+          stroke-dasharray="339.3" stroke-dashoffset="339.3" id="scoreRing"/>
+      </svg>
+      <div class="ring-label">
+        <div class="score-num" id="scoreNum" style="color:var(--teal)">0/5</div>
+      </div>
+    </div>
+    <div class="score-label" id="scoreMsg">Loading...</div>
+    <button onclick="resetExam()" style="margin-top:1.25rem; background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:.65rem 1.5rem; cursor:pointer; color:var(--text); font-family:'DM Sans',sans-serif; font-size:.9rem;">Retake Quiz</button>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="goTo(7)">← Full Case</button>
+    <button class="nav-btn primary" onclick="goTo(0)">🏠 Back to Start</button>
+  </div>
+</div>
+
+<script>
+const SECTIONS = document.querySelectorAll('.section');
+const TABS = document.querySelectorAll('.nav-tab');
+let currentSection = 0;
+let examScore = 0;
+let examAnswered = 0;
+
+function goTo(n) {
+  SECTIONS.forEach(s => s.classList.remove('active'));
+  TABS.forEach(t => t.classList.remove('active'));
+  document.getElementById('s'+n).classList.add('active');
+  TABS[n].classList.add('active');
+  currentSection = n;
+  document.getElementById('progressBar').style.width = ((n/(SECTIONS.length-1))*100)+'%';
+  window.scrollTo(0,0);
+}
+
+TABS.forEach((t,i) => t.addEventListener('click', ()=>goTo(i)));
+
+/* TICKER */
+const tickerItems = ['Revenue Cycle','HIPAA Privacy','False Claims Act','Stark Law','PHI Identifiers','Fraud vs Abuse','OIG Oversight','RAC Audits','Compliance Plans','HITECH Act','Anti-Kickback','Informed Consent'];
+const ti = document.getElementById('tickerInner');
+const doubled = [...tickerItems,...tickerItems];
+ti.innerHTML = doubled.map(x=>`<span class="ticker-item">◆ <span>${x}</span></span>`).join('');
+
+/* PHASE DATA */
+const phases = [
+  {name:'Pre-Registration', color:'var(--teal)', what:'Verify insurance eligibility and collect basic patient demographics BEFORE the visit.', ifFails:'Insurance denials, claim rejections, surprise patient bills.', keyTask:'Insurance verification, pre-auth requests, demographic collection.', exam:'Wrong demographics here → claim denied at billing.'},
+  {name:'Registration', color:'var(--blue2)', what:'Collect complete patient information: ID, insurance card, address, consent forms.', ifFails:'Incomplete records cause claim errors and compliance gaps.', keyTask:'Data entry accuracy, consent form collection.', exam:'A small typo in a patient ID cascades into a full denial.'},
+  {name:'Coding (CPT/ICD)', color:'var(--purple2)', what:'Assign correct CPT procedure codes and ICD diagnosis codes to every service.', ifFails:'Undercoding = lost revenue. Upcoding = fraud. Wrong code = denial.', keyTask:'Medical coding from physician notes. Requires certified coder.', exam:'Upcoding is fraud (intent). Consistent wrong codes from poor training = abuse.'},
+  {name:'Charge Capture & Billing', color:'var(--coral2)', what:'Convert services to charges and submit the claim to the insurance payer.', ifFails:'Unbundled charges, duplicate billing, rejected claims.', keyTask:'Claim submission via clearinghouse, UB-04 or CMS-1500 forms.', exam:'Billing for a non-covered service = denial. Billing for a service not done = FCA violation.'},
+  {name:'Payment & Remittance', color:'var(--amber2)', what:'Payer processes the claim and sends an Explanation of Benefits (EOB) with payment.', ifFails:'Partial payment, underpayment, contractual adjustments missed.', keyTask:'Post payments, reconcile EOBs, identify write-offs vs patient balances.', exam:'Understand the difference between write-off, adjustment, and denial.'},
+  {name:'Follow-Up & Appeals', color:'var(--pink2)', what:'Pursue denied or underpaid claims through appeals and patient collections.', ifFails:'Revenue is written off. Thousands of dollars lost permanently.', keyTask:'Track denied claims, file appeals, manage patient payment plans.', exam:'Know the difference between a soft denial (fixable) and a hard denial (final).'},
+];
+
+let selectedPhase = null;
+function selectPhase(i) {
+  document.querySelectorAll('.chain-node').forEach((n,j)=>{ n.classList.toggle('active-node', j===i); });
+  const p = phases[i];
+  const d = document.getElementById('phaseDetail');
+  d.style.display = 'block';
+  d.innerHTML = `
+    <h3 style="color:${p.color}">${p.name}</h3>
+    <p style="font-size:.9rem; color:var(--muted); margin-top:.25rem;">Revenue Cycle Phase ${i+1} of 6</p>
+    <div class="d-grid">
+      <div class="d-box"><div class="d-label">What happens here</div><div class="d-val">${p.what}</div></div>
+      <div class="d-box"><div class="d-label" style="color:var(--red)">If this fails</div><div class="d-val" style="color:#fca5a5">${p.ifFails}</div></div>
+      <div class="d-box"><div class="d-label">Key task</div><div class="d-val">${p.keyTask}</div></div>
+      <div class="d-box"><div class="d-label" style="color:var(--amber2)">Exam focus</div><div class="d-val" style="color:var(--amber2)">${p.exam}</div></div>
+    </div>`;
+}
+
+function revealConsequence(el, msg) {
+  el.disabled = true;
+  el.style.borderColor = 'var(--teal)';
+  el.style.color = 'var(--teal2)';
+  el.innerHTML += `<div style="margin-top:.5rem; font-size:.82rem; color:var(--muted);">${msg}</div>`;
+}
+
+/* LAW QUIZ */
+const lawQuizData = [
+  {scenario:'A medical biller sends patient diagnosis details to their friend via text message after work.', answer:'HIPAA', options:['HIPAA','Stark Law','FCA','FDCPA'], explain:'Sharing PHI with unauthorized individuals violates HIPAA\'s Privacy Rule. No minimum necessary exemption applies here — this is a clear unauthorized disclosure.'},
+  {scenario:'A clinic submits a Medicare claim for a CT scan that was never actually performed on the patient.', answer:'False Claims Act (FCA)', options:['HIPAA','False Claims Act (FCA)','Stark Law','HITECH'], explain:'Billing for services not rendered to a government payer is a textbook False Claims Act violation. Penalties include treble damages and potential criminal charges.'},
+  {scenario:'A physician refers all their Medicare patients to an imaging center where the doctor owns a 30% financial stake.', answer:'Stark Law', options:['AKS','Stark Law','FCA','HIPAA'], explain:'Stark Law prohibits physician self-referrals to entities in which they have a financial relationship, unless a specific exception applies.'},
+  {scenario:'A collections agency calls a patient at midnight three nights in a row demanding payment.', answer:'FDCPA', options:['HIPAA','FCA','FDCPA','Stark Law'], explain:'The Fair Debt Collection Practices Act prohibits calls before 8am or after 9pm, harassment, or abusive collection tactics.'},
+];
+
+function buildLawQuiz() {
+  const c = document.getElementById('lawQuiz');
+  c.innerHTML = lawQuizData.map((q,i)=>`
+    <div class="quiz-scenario" id="lq${i}">
+      <div class="qs-label">SCENARIO ${i+1}</div>
+      <div class="qs-text">${q.scenario}</div>
+      <div class="options-grid">
+        ${q.options.map(o=>`<button class="opt-btn" onclick="answerLawQuiz(${i},this,'${o.replace(/'/g,"\\'")}','${q.answer.replace(/'/g,"\\'")}','${q.explain.replace(/'/g,"\\'")}')">${o}</button>`).join('')}
+      </div>
+      <div class="feedback" id="lqf${i}"></div>
+    </div>`).join('');
+}
+
+function answerLawQuiz(i, el, chosen, correct, explain) {
+  const container = document.getElementById('lq'+i);
+  container.querySelectorAll('.opt-btn').forEach(b=>{ b.disabled=true; });
+  const fb = document.getElementById('lqf'+i);
+  if(chosen===correct){ el.classList.add('correct'); fb.className='feedback correct'; fb.innerHTML='✓ Correct! '+explain; }
+  else { el.classList.add('wrong'); fb.className='feedback wrong'; fb.innerHTML='✗ Not quite. The answer is <strong>'+correct+'</strong>. '+explain;
+    container.querySelectorAll('.opt-btn').forEach(b=>{ if(b.textContent.trim()===correct) b.classList.add('correct'); }); }
+}
+
+/* PHI */
+const phiItems = [
+  {label:'Email Address', isPhi:true, reason:'One of the 18 HIPAA identifiers. Links identity to health info.'},
+  {label:'ICD Diagnosis Code', isPhi:true, reason:'A diagnosis code tied to a patient record is PHI.'},
+  {label:'Favorite Color', isPhi:false, reason:'Cannot identify a patient. Not related to health or treatment.'},
+  {label:'Phone Number', isPhi:true, reason:'Direct identifier under HIPAA\'s 18 identifiers.'},
+  {label:'Next of Kin Name', isPhi:true, reason:'Can be used with other info to identify a patient.'},
+  {label:'Social Security #', isPhi:true, reason:'Strong unique identifier — always PHI in a health record.'},
+  {label:'Patient\'s Hometown', isPhi:true, reason:'Geographic data smaller than a state can be PHI.'},
+  {label:'Generic Drug Name', isPhi:false, reason:'A drug name alone (no patient link) is not PHI.'},
+  {label:'Date of Birth', isPhi:true, reason:'One of the 18 identifiers. Highly specific when combined.'},
+  {label:'Hospital Name', isPhi:false, reason:'The facility name alone is not PHI — it identifies a place, not a patient.'},
+  {label:'Account Number', isPhi:true, reason:'Financial identifiers tied to patient accounts are PHI.'},
+  {label:'General Age "40s"', isPhi:false, reason:'General age ranges without other identifying info are generally not PHI.'},
+];
+
+function buildPhi() {
+  const g = document.getElementById('phiGrid');
+  g.innerHTML = phiItems.map((p,i)=>`
+    <div class="phi-item" id="phi${i}" onclick="revealPhi(${i})">
+      <div>${p.label}</div>
+      <div class="phi-label" id="phiL${i}"></div>
+    </div>`).join('');
+}
+
+function revealPhi(i) {
+  const el = document.getElementById('phi'+i);
+  const lbl = document.getElementById('phiL'+i);
+  if(el.classList.contains('revealed-phi')||el.classList.contains('revealed-not')) return;
+  if(phiItems[i].isPhi){ el.classList.add('revealed-phi'); lbl.textContent='⚠ PHI — '+phiItems[i].reason; }
+  else { el.classList.add('revealed-not'); lbl.textContent='✓ NOT PHI — '+phiItems[i].reason; }
+}
+
+/* DISCLOSURE QUIZ */
+const disclosures = [
+  {scenario:'A nurse sends patient data to CMS (Centers for Medicare & Medicaid Services) for mandatory quality reporting.', allowed:true, explain:'HIPAA permits disclosure to government agencies for legally required reporting. This is a permitted use under the "required by law" exception.'},
+  {scenario:'A hospital shares patient records with a billing company they have contracted with to process claims.', allowed:true, explain:'Business Associate Agreements (BAA) permit sharing PHI with contracted third parties who need it for healthcare operations. The billing company is a Business Associate.'},
+  {scenario:'A receptionist reads a patient\'s diagnosis off their screen to a curious family member in the waiting room.', allowed:false, explain:'This is a HIPAA violation. You can only share PHI with the patient themselves or explicitly authorized individuals — not curious bystanders, even family members.'},
+];
+
+function buildDisclosure() {
+  const c = document.getElementById('disclosureQuiz');
+  c.innerHTML = disclosures.map((d,i)=>`
+    <div class="quiz-scenario" id="dq${i}">
+      <div class="qs-label">SCENARIO ${i+1}</div>
+      <div class="qs-text">${d.scenario}</div>
+      <div style="display:flex; gap:.5rem; margin-top:.75rem;">
+        <button class="opt-btn" onclick="answerDisc(${i},this,true,${d.allowed},'${d.explain.replace(/'/g,"\\'")}')">✓ Permitted Disclosure</button>
+        <button class="opt-btn" onclick="answerDisc(${i},this,false,${d.allowed},'${d.explain.replace(/'/g,"\\'")}')">✗ HIPAA Violation</button>
+      </div>
+      <div class="feedback" id="dqf${i}"></div>
+    </div>`).join('');
+}
+
+function answerDisc(i, el, chosen, correct, explain) {
+  document.querySelectorAll(`#dq${i} .opt-btn`).forEach(b=>b.disabled=true);
+  const fb = document.getElementById('dqf'+i);
+  if(chosen===correct){ el.classList.add('correct'); fb.className='feedback correct'; fb.innerHTML='✓ Correct! '+explain; }
+  else { el.classList.add('wrong'); fb.className='feedback wrong'; fb.innerHTML='✗ Not quite. '+explain; }
+}
+
+/* FRAUD ABUSE */
+const faItems = [
+  {text:'Billing for a service that was never performed', type:'fraud'},
+  {text:'Coding a higher-level visit by mistake due to poor staff training', type:'abuse'},
+  {text:'Repeatedly ordering unnecessary lab tests without clinical justification', type:'abuse'},
+  {text:'Knowingly using a deceased patient\'s Medicare number to bill claims', type:'fraud'},
+  {text:'Submitting duplicate claims for the same service by accident', type:'abuse'},
+  {text:'A provider deliberately uses wrong codes to inflate reimbursement', type:'fraud'},
+];
+
+function buildFraudAbuse() {
+  const c = document.getElementById('fraudAbuseActivity');
+  c.innerHTML = `
+    <p style="font-size:.875rem; color:var(--muted); margin-bottom:1rem;">Click each scenario to classify it:</p>
+    <div style="display:flex; flex-direction:column; gap:.6rem;" id="faList">
+      ${faItems.map((f,i)=>`
+        <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:1rem; font-size:.9rem;" id="fa${i}">
+          <div style="margin-bottom:.6rem;">${f.text}</div>
+          <div style="display:flex; gap:.5rem;">
+            <button class="opt-btn" style="font-size:.8rem; padding:.4rem .75rem;" onclick="classifyFA(${i},this,'fraud','${f.type}')">Fraud</button>
+            <button class="opt-btn" style="font-size:.8rem; padding:.4rem .75rem;" onclick="classifyFA(${i},this,'abuse','${f.type}')">Abuse</button>
+          </div>
+          <div id="faf${i}" style="display:none; margin-top:.5rem; font-size:.82rem;"></div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function classifyFA(i, el, chosen, correct) {
+  document.querySelectorAll(`#fa${i} button`).forEach(b=>b.disabled=true);
+  const faf = document.getElementById('faf'+i);
+  faf.style.display='block';
+  if(chosen===correct){
+    el.classList.add('correct');
+    const explanations = {
+      fraud: 'Correct — Fraud requires deliberate intent to deceive for financial gain.',
+      abuse: 'Correct — Abuse causes improper payment but lacks clear fraudulent intent.'
+    };
+    faf.style.color='var(--green)';
+    faf.innerHTML='✓ '+explanations[correct];
+  } else {
+    el.classList.add('wrong');
+    document.querySelectorAll(`#fa${i} button`).forEach(b=>{if(b.textContent.toLowerCase()===correct) b.classList.add('correct');});
+    faf.style.color='#fca5a5';
+    const flip = correct==='fraud' ? 'This was intentional — that makes it fraud, not just poor practice.' : 'There is no evidence of intent here. Poor training or processes = abuse, not fraud.';
+    faf.innerHTML='✗ The answer is <strong>'+correct.toUpperCase()+'</strong>. '+flip;
+  }
+}
+
+/* COMPLIANCE STEPS */
+const compSteps = [
+  {title:'Written Policies & Procedures', detail:'Every compliance plan must have documented policies covering billing, privacy, coding standards, and employee conduct. These are the foundation — without written rules, there is no standard to enforce.'},
+  {title:'Training & Education', detail:'All staff must receive regular training on HIPAA, coding rules, and fraud prevention. The OIG requires annual training for any provider receiving Medicare/Medicaid funding.'},
+  {title:'Designated Compliance Officer', detail:'One person must be responsible for overseeing compliance. They handle investigations, manage audits, and serve as the point of contact for the OIG.'},
+  {title:'Internal Auditing & Monitoring', detail:'Regular self-audits of claims, coding patterns, and billing practices. Catch problems before RAC auditors or OIG investigators find them.'},
+  {title:'Open Lines of Communication', detail:'Anonymous reporting mechanisms (hotlines, suggestion boxes) so staff can report violations without fear of retaliation. This is legally required under many state and federal programs.'},
+  {title:'Enforcement & Corrective Action', detail:'When violations are found, there must be a clear process for corrective action — from retraining to termination. Consistency is key to showing good-faith compliance.'},
+];
+
+function buildCompliance() {
+  const c = document.getElementById('complianceSteps');
+  c.innerHTML = compSteps.map((s,i)=>`
+    <div class="c-step" onclick="toggleStep(this)">
+      <div class="c-step-num">${i+1}</div>
+      <div class="c-step-content">
+        <div class="c-step-title">${s.title}</div>
+        <div class="c-step-detail">${s.detail}</div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleStep(el) { el.classList.toggle('expanded'); }
+
+function sdpAnswer(el, isCorrect) {
+  document.querySelectorAll('#s5 .opt-btn').forEach(b=>b.disabled=true);
+  const fb = document.getElementById('sdpFeedback');
+  fb.style.display='block'; fb.style.marginTop='.75rem';
+  if(isCorrect){
+    el.classList.add('correct');
+    fb.innerHTML='<div class="feedback correct">✓ Correct! The Self-Disclosure Protocol is the appropriate action. Self-reporting reduces penalties significantly and demonstrates good faith. Waiting for an audit and "hoping no one notices" are the worst options — they convert abuse into fraud.</div>';
+  } else {
+    el.classList.add('wrong');
+    fb.innerHTML='<div class="feedback wrong">✗ This would make the situation worse. Option C — Self-Disclosure — is the correct answer. Self-reporting to the OIG demonstrates good faith and results in significantly reduced penalties vs. being caught by an audit.</div>';
+  }
+}
+
+/* CONSENT QUIZ */
+const consentQs = [
+  {scenario:'A patient extends their arm and makes a fist when the phlebotomist approaches with a needle.', answer:'Implied', options:['Informed','Written','Implied'], explain:'The patient\'s physical action communicates consent without words. This is the classic example of implied consent.'},
+  {scenario:'A patient signs a detailed form before elective knee replacement surgery after the surgeon explains all risks and alternatives.', answer:'Informed', options:['Informed','Written','Implied'], explain:'Both elements are present: the patient was fully educated about risks (informed) and signed a document (written). This also qualifies as written consent, but the primary type here is informed because of the education component.'},
+  {scenario:'A patient signs a general treatment authorization form at the front desk during check-in.', answer:'Written', options:['Informed','Written','Implied'], explain:'The patient signed a document authorizing treatment. This is written consent. It differs from informed consent because no detailed procedure-specific education was provided.'},
+];
+
+function buildConsentQuiz() {
+  const c = document.getElementById('consentQuiz');
+  c.innerHTML = consentQs.map((q,i)=>`
+    <div class="quiz-scenario" id="cq${i}">
+      <div class="qs-label">SCENARIO ${i+1}</div>
+      <div class="qs-text">${q.scenario}</div>
+      <div class="options-grid">
+        ${q.options.map(o=>`<button class="opt-btn" onclick="answerConsent(${i},this,'${o}','${q.answer}','${q.explain.replace(/'/g,"\\'")}')"> ${o} Consent</button>`).join('')}
+      </div>
+      <div class="feedback" id="cqf${i}"></div>
+    </div>`).join('');
+}
+
+function answerConsent(i, el, chosen, correct, explain) {
+  document.querySelectorAll(`#cq${i} .opt-btn`).forEach(b=>b.disabled=true);
+  const fb = document.getElementById('cqf'+i);
+  if(chosen===correct){ el.classList.add('correct'); fb.className='feedback correct'; fb.innerHTML='✓ Correct! '+explain; }
+  else { el.classList.add('wrong'); fb.className='feedback wrong'; fb.innerHTML='✗ The answer is '+correct+' Consent. '+explain;
+    document.querySelectorAll(`#cq${i} .opt-btn`).forEach(b=>{if(b.textContent.trim().startsWith(correct)) b.classList.add('correct');}); }
+}
+
+/* CASE FACTS */
+const caseFactsData = [
+  'The provider regularly upcodes office visits from Level 2 to Level 4, consistently billing higher than the services documented.',
+  'A staff member accessed patient records and shared diagnosis information with a reporter from a local newspaper.',
+  'The clinic failed to verify insurance eligibility for 30% of patients over the past quarter, causing widespread claim rejections.',
+  'During an RAC audit, it was discovered the clinic received $380,000 in Medicare overpayments over 18 months.',
+];
+
+const caseViolations = [
+  {num:'Violation 1', text:'Upcoding visits with intent to receive higher reimbursement', law:'False Claims Act (FCA) + Fraud', lawClass:'red'},
+  {num:'Violation 2', text:'Unauthorized disclosure of patient diagnosis to a reporter', law:'HIPAA Privacy Rule + HITECH', lawClass:'blue'},
+  {num:'Violation 3', text:'Systemic failure to verify insurance — pattern of negligent billing', law:'Compliance Plan failure + Potential Abuse', lawClass:'amber'},
+  {num:'Violation 4', text:'$380K in Medicare overpayments — failure to self-disclose', law:'False Claims Act (FCA) + OIG Self-Disclosure failure', lawClass:'red'},
+];
+
+function buildCase() {
+  const c = document.getElementById('caseFacts');
+  c.innerHTML = caseFactsData.map((f,i)=>`
+    <div class="case-fact">
+      <div class="cf-num">FACT ${i+1}</div>
+      ${f}
+    </div>`).join('');
+
+  const vl = document.getElementById('violationsList');
+  vl.innerHTML = caseViolations.map(v=>`
+    <div class="violation-item">
+      <span class="v-badge">${v.num}</span>
+      <div class="v-text">${v.text} — <span class="v-law">${v.law}</span></div>
+    </div>`).join('');
+}
+
+function revealCase() {
+  document.getElementById('casePanel').classList.add('shown');
+  document.getElementById('caseRevealBtn').style.display='none';
+}
+
+/* EXAM */
+const examData = [
+  {q:'A claim is denied because the patient\'s date of birth was entered incorrectly. Which phase of the revenue cycle failed?', opts:['Coding','Billing','Pre-Registration','Payment'], correct:2, explain:'Patient demographics including date of birth are collected in the Pre-Registration or Registration phase. An error here cascades into claim denial downstream.'},
+  {q:'Which federal law specifically prohibits physician self-referrals to facilities in which they have a financial interest?', opts:['HIPAA','Stark Law','HITECH','False Claims Act'], correct:1, explain:'The Stark Law (Physician Self-Referral Law) prohibits doctors from referring Medicare/Medicaid patients to entities where they have a financial relationship, unless an exception applies.'},
+  {q:'Which of the following is NOT Protected Health Information (PHI)?', opts:['Social Security Number','Phone Number','Favorite Color','Email Address'], correct:2, explain:'A patient\'s favorite color cannot identify them and is unrelated to health. All the other options are among HIPAA\'s 18 identified categories of PHI.'},
+  {q:'A provider intentionally submits claims to Medicare for services that were never rendered. This is best classified as:', opts:['Abuse','Fraud','Billing Error','Compliance Issue'], correct:1, explain:'Billing for services never rendered is the textbook definition of fraud — there is clear intentional deception to obtain government payment. This violates the False Claims Act.'},
+  {q:'A clinic repeatedly bills higher-level office visits than were actually performed due to inadequate coder training. There is no intent to deceive. This is best classified as:', opts:['Fraud','Abuse','Legal — within tolerance','Compliant coding'], correct:1, explain:'Intent matters. Because there is no deliberate deception — only poor training — this is classified as Abuse, not Fraud. However, if the provider is warned and continues, it can become fraud.'},
+];
+
+let examState = [];
+
+function buildExam() {
+  examScore = 0; examAnswered = 0;
+  examState = examData.map(()=>({answered:false}));
+  document.getElementById('scoreWrap').style.display='none';
+  const c = document.getElementById('examQuestions');
+  c.innerHTML = examData.map((q,i)=>`
+    <div class="exam-q" id="eq${i}">
+      <div class="q-num">QUESTION ${i+1} OF ${examData.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-options">
+        ${q.opts.map((o,j)=>`
+          <button class="q-opt" id="eq${i}o${j}" onclick="answerExam(${i},${j},${q.correct},'${q.explain.replace(/'/g,"\\'")}')">
+            <span class="opt-letter">${['A','B','C','D'][j]}</span>${o}
+          </button>`).join('')}
+      </div>
+      <div class="q-explain" id="eqx${i}">${q.explain}</div>
+    </div>`).join('');
+}
+
+function answerExam(qi, chosen, correct, explain) {
+  if(examState[qi].answered) return;
+  examState[qi].answered = true;
+  document.querySelectorAll(`#eq${qi} .q-opt`).forEach(b=>b.disabled=true);
+  const chosenEl = document.getElementById(`eq${qi}o${chosen}`);
+  const correctEl = document.getElementById(`eq${qi}o${correct}`);
+  const xEl = document.getElementById('eqx'+qi);
+  if(chosen===correct){ chosenEl.classList.add('correct-ans'); examScore++; }
+  else { chosenEl.classList.add('wrong-ans'); correctEl.classList.add('correct-ans'); }
+  xEl.classList.add('shown');
+  examAnswered++;
+  if(examAnswered===examData.length) showScore();
+}
+
+function showScore() {
+  const sw = document.getElementById('scoreWrap');
+  sw.style.display='block';
+  const pct = examScore/examData.length;
+  const ring = document.getElementById('scoreRing');
+  const circum = 339.3;
+  setTimeout(()=>{ ring.style.transition='stroke-dashoffset 1s ease'; ring.style.strokeDashoffset = circum*(1-pct); },100);
+  document.getElementById('scoreNum').textContent = examScore+'/'+examData.length;
+  const msgs = ['Keep studying — review the sections above and try again!','Good start! Review the questions you missed and retake.','Nice work! A couple more reviews and you\'ll nail the exam.','Excellent! You understand the core concepts well.','Perfect score! You\'re ready for the NHA exam.'];
+  document.getElementById('scoreMsg').textContent = msgs[examScore] || msgs[4];
+  const colors = ['var(--red)','var(--amber2)','var(--amber2)','var(--teal)','var(--green)'];
+  ring.style.stroke = colors[Math.min(examScore,4)];
+  document.getElementById('scoreNum').style.color = colors[Math.min(examScore,4)];
+}
+
+function resetExam() { buildExam(); }
+
+/* LAW TOGGLE */
+function toggleLaw(el) { el.classList.toggle('open'); }
+
+/* INIT */
+buildLawQuiz();
+buildPhi();
+buildDisclosure();
+buildFraudAbuse();
+buildCompliance();
+buildConsentQuiz();
+buildCase();
+buildExam();
+</script>
+</body>
+</html>
