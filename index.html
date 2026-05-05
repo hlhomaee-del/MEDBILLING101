@@ -353,6 +353,58 @@
     color: #fff !important;
   }
 
+
+  /* FIX: makes every scenario answer area visibly clickable and prevents hidden overlays from blocking clicks */
+  .quiz-scenario,
+  .case-fact,
+  .fa-scenario-card {
+    position: relative;
+    z-index: 1;
+  }
+
+  .quiz-scenario button,
+  .quiz-scenario .opt-btn,
+  .fa-scenario-card button,
+  #fraudAbuseActivity button,
+  #lawQuiz button,
+  #disclosureQuiz button,
+  #consentQuiz button,
+  #examQuestions button {
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 5;
+    user-select: none;
+    touch-action: manipulation;
+  }
+
+  .fa-scenario-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 1rem;
+    font-size: .9rem;
+    cursor: pointer;
+    transition: all .2s;
+  }
+
+  .fa-scenario-card:hover {
+    border-color: var(--teal);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(0,0,0,.22);
+  }
+
+  .fa-answer-panel {
+    display: none;
+    margin-top: .65rem;
+    padding: .65rem .8rem;
+    border-radius: var(--r2);
+    font-size: .84rem;
+    line-height: 1.45;
+    background: rgba(45,212,160,.08);
+    border: 1px solid rgba(45,212,160,.22);
+    color: var(--teal2);
+  }
+
 </style>
 </head>
 <body>
@@ -905,7 +957,7 @@ function buildLawQuiz() {
       <div class="qs-label">SCENARIO ${i+1}</div>
       <div class="qs-text">${q.scenario}</div>
       <div class="options-grid">
-        ${q.options.map(o=>`<button class="opt-btn" onclick="answerLawQuiz(${i},this,'${o.replace(/'/g,"\\'")}','${q.answer.replace(/'/g,"\\'")}','${q.explain.replace(/'/g,"\\'")}')">${o}</button>`).join('')}
+        ${q.options.map(o=>`<button type="button" class="opt-btn" onclick="answerLawQuiz(${i},this,'${o.replace(/'/g,"\\'")}','${q.answer.replace(/'/g,"\\'")}','${q.explain.replace(/'/g,"\\'")}')">${o}</button>`).join('')}
       </div>
       <div class="feedback" id="lqf${i}"></div>
     </div>`).join('');
@@ -964,21 +1016,40 @@ function buildDisclosure() {
   const c = document.getElementById('disclosureQuiz');
   c.innerHTML = disclosures.map((d,i)=>`
     <div class="quiz-scenario" id="dq${i}">
-      <div class="qs-label">SCENARIO ${i+1}</div>
+      <div class="qs-label">PHI SCENARIO ${i+1}</div>
       <div class="qs-text">${d.scenario}</div>
-      <div style="display:flex; gap:.5rem; margin-top:.75rem;">
-        <button class="opt-btn" onclick="answerDisc(${i},this,true,${d.allowed},'${d.explain.replace(/'/g,"\\'")}')">✓ Permitted Disclosure</button>
-        <button class="opt-btn" onclick="answerDisc(${i},this,false,${d.allowed},'${d.explain.replace(/'/g,"\\'")}')">✗ HIPAA Violation</button>
+      <div class="options-grid" style="grid-template-columns:1fr 1fr; margin-top:.75rem;">
+        <button type="button" class="opt-btn disclosure-choice" data-index="${i}" data-choice="true">✓ Permitted Disclosure</button>
+        <button type="button" class="opt-btn disclosure-choice" data-index="${i}" data-choice="false">✗ HIPAA Violation</button>
       </div>
       <div class="feedback" id="dqf${i}"></div>
     </div>`).join('');
+
+  /* Important fix: use event listeners instead of inline onclick.
+     Inline onclick broke Scenario 1 because its explanation contained quotation marks. */
+  document.querySelectorAll('.disclosure-choice').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = Number(btn.dataset.index);
+      const chosen = btn.dataset.choice === 'true';
+      answerDisc(i, btn, chosen);
+    });
+  });
 }
 
-function answerDisc(i, el, chosen, correct, explain) {
+function answerDisc(i, el, chosen) {
+  const item = disclosures[i];
+  const correct = item.allowed;
   document.querySelectorAll(`#dq${i} .opt-btn`).forEach(b=>b.disabled=true);
   const fb = document.getElementById('dqf'+i);
-  if(chosen===correct){ el.classList.add('correct'); fb.className='feedback correct'; fb.innerHTML='✓ Correct! '+explain; }
-  else { el.classList.add('wrong'); fb.className='feedback wrong'; fb.innerHTML='✗ Not quite. '+explain; }
+  if(chosen===correct){
+    el.classList.add('correct');
+    fb.className='feedback correct';
+    fb.innerHTML='✓ Correct! '+item.explain;
+  } else {
+    el.classList.add('wrong');
+    fb.className='feedback wrong';
+    fb.innerHTML='✗ Not quite. '+item.explain;
+  }
 }
 
 /* FRAUD ABUSE */
@@ -994,18 +1065,30 @@ const faItems = [
 function buildFraudAbuse() {
   const c = document.getElementById('fraudAbuseActivity');
   c.innerHTML = `
-    <p style="font-size:.875rem; color:var(--muted); margin-bottom:1rem;">Click each scenario to classify it:</p>
+    <p style="font-size:.875rem; color:var(--muted); margin-bottom:1rem;">Click the scenario card itself to reveal the category, or choose Fraud/Abuse first:</p>
     <div style="display:flex; flex-direction:column; gap:.6rem;" id="faList">
       ${faItems.map((f,i)=>`
-        <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:1rem; font-size:.9rem;" id="fa${i}">
-          <div style="margin-bottom:.6rem;">${f.text}</div>
-          <div style="display:flex; gap:.5rem;">
-            <button class="opt-btn" style="font-size:.8rem; padding:.4rem .75rem;" onclick="classifyFA(${i},this,'fraud','${f.type}')">Fraud</button>
-            <button class="opt-btn" style="font-size:.8rem; padding:.4rem .75rem;" onclick="classifyFA(${i},this,'abuse','${f.type}')">Abuse</button>
+        <div class="fa-scenario-card" id="fa${i}" onclick="revealFA(${i})" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); revealFA(${i});}">
+          <div style="margin-bottom:.6rem;"><strong>Scenario ${i+1}:</strong> ${f.text}</div>
+          <div style="display:flex; gap:.5rem; flex-wrap:wrap;">
+            <button type="button" class="opt-btn" style="font-size:.8rem; padding:.4rem .75rem;" onclick="event.stopPropagation(); classifyFA(${i},this,'fraud','${f.type}')">Fraud</button>
+            <button type="button" class="opt-btn" style="font-size:.8rem; padding:.4rem .75rem;" onclick="event.stopPropagation(); classifyFA(${i},this,'abuse','${f.type}')">Abuse</button>
+            <button type="button" class="opt-btn" style="font-size:.8rem; padding:.4rem .75rem;" onclick="event.stopPropagation(); revealFA(${i})">Reveal Answer</button>
           </div>
-          <div id="faf${i}" style="display:none; margin-top:.5rem; font-size:.82rem;"></div>
+          <div id="faf${i}" class="fa-answer-panel"></div>
         </div>`).join('')}
     </div>`;
+}
+
+function revealFA(i) {
+  const correct = faItems[i].type;
+  const panel = document.getElementById('faf'+i);
+  if(!panel) return;
+  panel.style.display = 'block';
+  panel.innerHTML = `<strong>${correct.toUpperCase()}</strong> — ${correct === 'fraud' ? 'intentional deception for payment.' : 'improper practice/cost problem without clear intent.'}`;
+  document.querySelectorAll(`#fa${i} button`).forEach(b=>{
+    if(b.textContent.trim().toLowerCase() === correct) b.classList.add('correct');
+  });
 }
 
 function classifyFA(i, el, chosen, correct) {
@@ -1022,7 +1105,7 @@ function classifyFA(i, el, chosen, correct) {
     faf.innerHTML='✓ '+explanations[correct];
   } else {
     el.classList.add('wrong');
-    document.querySelectorAll(`#fa${i} button`).forEach(b=>{if(b.textContent.toLowerCase()===correct) b.classList.add('correct');});
+    document.querySelectorAll(`#fa${i} button`).forEach(b=>{if(b.textContent.trim().toLowerCase()===correct) b.classList.add('correct');});
     faf.style.color='#fca5a5';
     const flip = correct==='fraud' ? 'This was intentional — that makes it fraud, not just poor practice.' : 'There is no evidence of intent here. Poor training or processes = abuse, not fraud.';
     faf.innerHTML='✗ The answer is <strong>'+correct.toUpperCase()+'</strong>. '+flip;
@@ -1080,7 +1163,7 @@ function buildConsentQuiz() {
       <div class="qs-label">SCENARIO ${i+1}</div>
       <div class="qs-text">${q.scenario}</div>
       <div class="options-grid">
-        ${q.options.map(o=>`<button class="opt-btn" onclick="answerConsent(${i},this,'${o}','${q.answer}','${q.explain.replace(/'/g,"\\'")}')"> ${o} Consent</button>`).join('')}
+        ${q.options.map(o=>`<button type="button" class="opt-btn" onclick="answerConsent(${i},this,'${o}','${q.answer}','${q.explain.replace(/'/g,"\\'")}')"> ${o} Consent</button>`).join('')}
       </div>
       <div class="feedback" id="cqf${i}"></div>
     </div>`).join('');
@@ -1152,7 +1235,7 @@ function buildExam() {
       <div class="q-text">${q.q}</div>
       <div class="q-options">
         ${q.opts.map((o,j)=>`
-          <button class="q-opt" id="eq${i}o${j}" onclick="answerExam(${i},${j},${q.correct},'${q.explain.replace(/'/g,"\\'")}')">
+          <button type="button" class="q-opt" id="eq${i}o${j}" onclick="answerExam(${i},${j},${q.correct},'${q.explain.replace(/'/g,"\\'")}')">
             <span class="opt-letter">${['A','B','C','D'][j]}</span>${o}
           </button>`).join('')}
       </div>
